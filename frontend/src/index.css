@@ -1,0 +1,179 @@
+/* ─────────────────────────────────────────────
+   GOVI NETHA — Global Styles
+   Matches the wireframe: white cards, green brand,
+   red/amber/green severity colours, mobile-first
+   ───────────────────────────────────────────── */
+
+:root {
+  --brand-green:   #16a34a;
+  --brand-green-light: #dcfce7;
+  --critical-red:  #dc2626;
+  --critical-bg:   #fef2f2;
+  --warning-amber: #d97706;
+  --warning-bg:    #fffbeb;
+  --normal-green:  #16a34a;
+  --normal-bg:     #f0fdf4;
+  --text-primary:  #111827;
+  --text-muted:    #6b7280;
+  --border:        #e5e7eb;
+  --card-bg:       #ffffff;
+  --page-bg:       #f9fafb;
+  --nav-height:    64px;
+  --top-height:    56px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--page-bg);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+/* ── Shell layout ───────────────────────────── */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--page-bg);
+}
+
+/* ── Top bar ────────────────────────────────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--top-height);
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.topbar-brand { display: flex; flex-direction: column; }
+.brand-name   { font-size: 18px; font-weight: 700; color: var(--brand-green); }
+.brand-sub    { font-size: 11px; color: var(--text-muted); }
+.topbar-bell  { color: var(--text-primary); }
+
+/* ── Page content ───────────────────────────── */
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  padding-bottom: calc(var(--nav-height) + 16px);
+}
+
+/* ── Bottom nav ─────────────────────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  height: var(--nav-height);
+  background: #fff;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 8px 12px;
+}
+.nav-item.active { color: var(--brand-green); }
+
+/* ── Cards ──────────────────────────────────── */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.card-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.card-unit { font-size: 14px; font-weight: 400; color: var(--text-muted); }
+
+/* ── Sensor grid ────────────────────────────── */
+.sensor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* ── Severity banners ───────────────────────── */
+.banner {
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.banner.critical { background: var(--critical-bg); border-left: 4px solid var(--critical-red); }
+.banner.warning  { background: var(--warning-bg);  border-left: 4px solid var(--warning-amber); }
+.banner.normal   { background: var(--normal-bg);   border-left: 4px solid var(--normal-green); }
+.banner-title    { font-weight: 700; font-size: 14px; }
+.banner.critical .banner-title { color: var(--critical-red); }
+.banner.warning  .banner-title { color: var(--warning-amber); }
+.banner.normal   .banner-title { color: var(--normal-green); }
+.banner-body     { font-size: 13px; color: var(--text-primary); }
+.banner-time     { font-size: 11px; color: var(--text-muted); }
+
+/* ── Severity badge ─────────────────────────── */
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.badge.critical { background: var(--critical-red);  color: #fff; }
+.badge.warning  { background: var(--warning-amber); color: #fff; }
+.badge.normal   { background: var(--normal-green);  color: #fff; }
+
+/* ── Progress bar ───────────────────────────── */
+.progress-bar-wrap { background: #e5e7eb; border-radius: 99px; height: 8px; margin: 6px 0; }
+.progress-bar      { height: 8px; border-radius: 99px; transition: width 0.4s; }
+.progress-bar.green  { background: var(--brand-green); }
+.progress-bar.amber  { background: var(--warning-amber); }
+.progress-bar.red    { background: var(--critical-red); }
+
+/* ── Section title ──────────────────────────── */
+.section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+
+/* ── Loading / Error ────────────────────────── */
+.loading { text-align: center; padding: 32px; color: var(--text-muted); }
+.error   { color: var(--critical-red); text-align: center; padding: 32px; }
+
+/* ── Gauge (stress page) ────────────────────── */
+.gauge-wrap { display: flex; flex-direction: column; align-items: center; padding: 24px 0 12px; }
+.gauge-value { font-size: 48px; font-weight: 800; }
+.gauge-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }

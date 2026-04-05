@@ -1,0 +1,32 @@
+# Environment
+.env
+*.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+*.pkl
+*.joblib
+dist/
+build/
+*.egg-info/
+
+# Node / React
+node_modules/
+dist/
+.DS_Store
+
+# PlatformIO
+edge/.pio/
+edge/.vscode/
+
+# ML datasets (add your own data files here, don't commit raw data)
+backend/ml/**/data/
+backend/ml/**/*.csv
+
+# IDE
+.idea/
+*.swp
