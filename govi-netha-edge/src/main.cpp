@@ -3,7 +3,7 @@
  * Smart Irrigation Optimization
  *
  * Timing:
- *   Edge reads + inference: every 1 minute (EDGE_READ_INTERVAL_MS)
+ *   Edge reads + inference: every 1 minute  (EDGE_READ_INTERVAL_MS)
  *   Cloud send:             every 5 minutes (CLOUD_SEND_INTERVAL_MS)
  *
  * Data source:
@@ -18,25 +18,24 @@
 #include <ArduinoJson.h>
 #include "config.h"
 #include "sensors/MockSensors.h"
-#include "EdgeAI.h"
+#include "TFLiteInference.h"
 
-// ── Global state ────────────────────────────────────────────
+// Global state
 unsigned long lastEdgeRead = 0;
 unsigned long lastCloudSend = 0;
 
-// Latest readings (shared between edge and cloud send)
+// Latest readings (shared between edge read and cloud send)
 float g_moisture = 0.0f;
 float g_temperature = 0.0f;
 float g_humidity = 0.0f;
 int g_edgeState = 0;
 String g_edgeLabel = "UNKNOWN";
 
-// ── Function declarations ───────────────────────────────────
+// Function declarations
 void connectWiFi();
 void doEdgeRead();
 bool sendToCloud();
 
-// ───────────────────────────────────────────────────────────
 void setup()
 {
     Serial.begin(115200);
@@ -51,8 +50,16 @@ void setup()
     pinMode(LED_PIN, OUTPUT);
     digitalWrite(LED_PIN, LOW);
 
-    // Print mock sensor notice
-    MockSensors::printStatus();
+    bool tflite_ok = TFLiteInference::init();
+    if (tflite_ok)
+    {
+        Serial.println("[TFLITE] Model loaded successfully on ESP32.");
+    }
+    else
+    {
+        Serial.println("[TFLITE] Model failed — using rule-based fallback.");
+    }
+
     Serial.println("");
 
     // Connect to WiFi
@@ -64,19 +71,18 @@ void setup()
     lastCloudSend = millis();
 }
 
-// ───────────────────────────────────────────────────────────
 void loop()
 {
     unsigned long now = millis();
 
-    // ── Edge read every 1 minute ──
+    // Edge read every 1 minute
     if (now - lastEdgeRead >= EDGE_READ_INTERVAL_MS)
     {
         lastEdgeRead = now;
         doEdgeRead();
     }
 
-    // ── Cloud send every 5 minutes ──
+    // Cloud send every 5 minutes
     if (now - lastCloudSend >= CLOUD_SEND_INTERVAL_MS)
     {
         lastCloudSend = now;
@@ -92,7 +98,7 @@ void loop()
     }
 }
 
-// ── WiFi connection ─────────────────────────────────────────
+// WiFi connection
 void connectWiFi()
 {
     Serial.printf("[WIFI] Connecting to %s", WIFI_SSID);
@@ -108,7 +114,8 @@ void connectWiFi()
 
     if (WiFi.status() == WL_CONNECTED)
     {
-        Serial.printf("\n[WIFI] Connected. IP: %s\n\n", WiFi.localIP().toString().c_str());
+        Serial.printf("\n[WIFI] Connected. IP: %s\n\n",
+                      WiFi.localIP().toString().c_str());
         digitalWrite(LED_PIN, HIGH);
         delay(200);
         digitalWrite(LED_PIN, LOW);
@@ -119,12 +126,13 @@ void connectWiFi()
     }
 }
 
-// ── Edge read + AI inference ────────────────────────────────
+// Edge read + AI inference
 void doEdgeRead()
 {
     Serial.println("── Edge Read ───────────────────────────────");
 
-    // Read sensors (swap these three lines for real sensors after hardware arrives)
+    // Read sensors
+    // (swap these three lines for real sensors after hardware arrives)
     g_moisture = MockSensors::readMoisturePct();
     g_temperature = MockSensors::readTemperatureC();
     g_humidity = MockSensors::readHumidityPct();
@@ -133,16 +141,13 @@ void doEdgeRead()
     Serial.printf("  Temperature: %.1f C\n", g_temperature);
     Serial.printf("  Humidity:    %.1f %%\n\n", g_humidity);
 
-    // Run edge AI classifier
-    EdgeAI::Result result = EdgeAI::classify(g_moisture, g_temperature, g_humidity);
-    g_edgeState = result.state;
-    g_edgeLabel = result.label;
+    // Run TFLite Micro neural network classifier
+    g_edgeState = TFLiteInference::predict(g_moisture, g_temperature, g_humidity);
+    String labels[] = {"OK", "IRRIGATE_SOON", "IRRIGATE_NOW"};
+    g_edgeLabel = labels[g_edgeState];
+    Serial.printf("  [AI RESULT] State: %d (%s)\n", g_edgeState, g_edgeLabel.c_str());
 
-    Serial.println("── Edge AI Result ──────────────────────────");
-    Serial.println("  " + result.message);
-
-    // Control LED based on classification
-    if (result.state == 2)
+    if (g_edgeState == 2)
     {
         // CRITICAL — blink LED rapidly 5 times then leave on
         for (int i = 0; i < 5; i++)
@@ -155,7 +160,7 @@ void doEdgeRead()
         digitalWrite(LED_PIN, HIGH);
         Serial.println("  [LED] ON — critical alert");
     }
-    else if (result.state == 1)
+    else if (g_edgeState == 1)
     {
         // WARNING — single slow blink
         digitalWrite(LED_PIN, HIGH);
@@ -173,7 +178,7 @@ void doEdgeRead()
     Serial.println("");
 }
 
-// ── HTTP POST to cloud ──────────────────────────────────────
+// HTTP POST to cloud
 bool sendToCloud()
 {
     Serial.println("── Cloud Send ──────────────────────────────");
@@ -189,14 +194,7 @@ bool sendToCloud()
     doc["temperature"] = round(g_temperature * 10.0f) / 10.0f;
     doc["humidity"] = round(g_humidity * 10.0f) / 10.0f;
 
-    // Include NPK and pH as placeholder values (will be real when sensors arrive)
-    // These allow the backend and dashboard to function fully now
-    doc["ph"] = 6.5f;          // typical healthy paddy soil pH
-    doc["nitrogen"] = 78.0f;   // mg/kg — adequate level
-    doc["phosphorus"] = 45.0f; // mg/kg — adequate level
-    doc["potassium"] = 95.0f;  // mg/kg — adequate level
-
-    // Include edge AI result so the backend can log it
+    // Include edge AI result so the backend can log the classification
     doc["edge_state"] = g_edgeState;
     doc["edge_label"] = g_edgeLabel;
 
