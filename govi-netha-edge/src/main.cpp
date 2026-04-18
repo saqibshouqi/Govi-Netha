@@ -1,37 +1,24 @@
-/**
- * GOVI NETHA — ESP32 Edge Firmware
- * Smart Irrigation Optimization
- *
- * Timing:
- *   Edge reads + inference: every 1 minute  (EDGE_READ_INTERVAL_MS)
- *   Cloud send:             every 5 minutes (CLOUD_SEND_INTERVAL_MS)
- *
- * Data source:
- *   Currently: MockSensors (simulated data)
- *   After hardware arrives: replace MockSensors calls with
- *                           real SoilMoisture + TempHumidity calls
- */
-
 #include <Arduino.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <DHT.h>
 #include "config.h"
-#include "sensors/MockSensors.h"
 #include "TFLiteInference.h"
+
+// DHT sensor
+DHT dht(PIN_DHT, DHT22);
 
 // Global state
 unsigned long lastEdgeRead = 0;
 unsigned long lastCloudSend = 0;
 
-// Latest readings (shared between edge read and cloud send)
 float g_moisture = 0.0f;
 float g_temperature = 0.0f;
 float g_humidity = 0.0f;
 int g_edgeState = 0;
 String g_edgeLabel = "UNKNOWN";
 
-// Function declarations
 void connectWiFi();
 void doEdgeRead();
 bool sendToCloud();
@@ -46,9 +33,12 @@ void setup()
     Serial.println("╚══════════════════════════════════════╝");
     Serial.println("");
 
-    // LED setup
     pinMode(LED_PIN, OUTPUT);
     digitalWrite(LED_PIN, LOW);
+
+    // Init DHT sensor
+    dht.begin();
+    delay(2000);  // DHT22 needs time to stabilize
 
     bool tflite_ok = TFLiteInference::init();
     if (tflite_ok)
@@ -61,11 +51,7 @@ void setup()
     }
 
     Serial.println("");
-
-    // Connect to WiFi
     connectWiFi();
-
-    // Run the first edge read immediately at startup
     doEdgeRead();
     lastEdgeRead = millis();
     lastCloudSend = millis();
@@ -75,14 +61,12 @@ void loop()
 {
     unsigned long now = millis();
 
-    // Edge read every 1 minute
     if (now - lastEdgeRead >= EDGE_READ_INTERVAL_MS)
     {
         lastEdgeRead = now;
         doEdgeRead();
     }
 
-    // Cloud send every 5 minutes
     if (now - lastCloudSend >= CLOUD_SEND_INTERVAL_MS)
     {
         lastCloudSend = now;
@@ -98,7 +82,6 @@ void loop()
     }
 }
 
-// WiFi connection
 void connectWiFi()
 {
     Serial.printf("[WIFI] Connecting to %s", WIFI_SSID);
@@ -126,22 +109,30 @@ void connectWiFi()
     }
 }
 
-// Edge read + AI inference
 void doEdgeRead()
 {
     Serial.println("── Edge Read ───────────────────────────────");
 
-    // Read sensors
-    // (swap these three lines for real sensors after hardware arrives)
-    g_moisture = MockSensors::readMoisturePct();
-    g_temperature = MockSensors::readTemperatureC();
-    g_humidity = MockSensors::readHumidityPct();
+    // Read REAL sensors
+    int soilRaw = analogRead(PIN_MOISTURE);
+    g_moisture = map(soilRaw, 4095, 1500, 0, 100);
+    g_moisture = constrain(g_moisture, 0, 100);
+    g_temperature = dht.readTemperature();
+    g_humidity = dht.readHumidity();
+
+    // Check if DHT22 failed
+    if (isnan(g_temperature) || isnan(g_humidity))
+    {
+        Serial.println("  [DHT22] FAILED - check wiring on GPIO4");
+        g_temperature = 0.0f;
+        g_humidity = 0.0f;
+    }
 
     Serial.printf("  Moisture:    %.1f %%\n", g_moisture);
     Serial.printf("  Temperature: %.1f C\n", g_temperature);
     Serial.printf("  Humidity:    %.1f %%\n\n", g_humidity);
 
-    // Run TFLite Micro neural network classifier
+    // Run TFLite inference
     g_edgeState = TFLiteInference::predict(g_moisture, g_temperature, g_humidity);
     String labels[] = {"OK", "IRRIGATE_SOON", "IRRIGATE_NOW"};
     g_edgeLabel = labels[g_edgeState];
@@ -149,7 +140,6 @@ void doEdgeRead()
 
     if (g_edgeState == 2)
     {
-        // CRITICAL — blink LED rapidly 5 times then leave on
         for (int i = 0; i < 5; i++)
         {
             digitalWrite(LED_PIN, HIGH);
@@ -162,7 +152,6 @@ void doEdgeRead()
     }
     else if (g_edgeState == 1)
     {
-        // WARNING — single slow blink
         digitalWrite(LED_PIN, HIGH);
         delay(500);
         digitalWrite(LED_PIN, LOW);
@@ -178,7 +167,6 @@ void doEdgeRead()
     Serial.println("");
 }
 
-// HTTP POST to cloud
 bool sendToCloud()
 {
     Serial.println("── Cloud Send ──────────────────────────────");
@@ -188,19 +176,15 @@ bool sendToCloud()
     http.addHeader("Content-Type", "application/json");
     http.setTimeout(10000);
 
-    // Build the JSON payload
     JsonDocument doc;
     doc["moisture"] = round(g_moisture * 10.0f) / 10.0f;
     doc["temperature"] = round(g_temperature * 10.0f) / 10.0f;
     doc["humidity"] = round(g_humidity * 10.0f) / 10.0f;
-
-    // Include edge AI result so the backend can log the classification
     doc["edge_state"] = g_edgeState;
     doc["edge_label"] = g_edgeLabel;
 
     String body;
     serializeJson(doc, body);
-
     Serial.println("  Payload: " + body);
 
     int httpCode = http.POST(body);
@@ -208,7 +192,6 @@ bool sendToCloud()
     if (httpCode == 200 || httpCode == 201)
     {
         Serial.printf("  [OK] HTTP %d — data stored in MongoDB\n", httpCode);
-        // Flash LED twice to confirm successful cloud send
         for (int i = 0; i < 2; i++)
         {
             digitalWrite(LED_PIN, HIGH);
@@ -225,6 +208,4 @@ bool sendToCloud()
         http.end();
         return false;
     }
-
-    Serial.println("────────────────────────────────────────────\n");
 }
