@@ -6,23 +6,35 @@
 #include "config.h"
 #include "TFLiteInference.h"
 
-// DHT sensor
+// ======================================================
+// DHT22 SENSOR OBJECT
+// ======================================================
 DHT dht(PIN_DHT, DHT22);
 
-// Global state
+// ======================================================
+// GLOBAL VARIABLES
+// ======================================================
+// Track time for periodic sensor reading and cloud sending
 unsigned long lastEdgeRead = 0;
 unsigned long lastCloudSend = 0;
 
+// Store latest sensor values and AI prediction
 float g_moisture = 0.0f;
 float g_temperature = 0.0f;
 float g_humidity = 0.0f;
 int g_edgeState = 0;
 String g_edgeLabel = "UNKNOWN";
 
+// ======================================================
+// FUNCTION DECLARATIONS
+// ======================================================
 void connectWiFi();
 void doEdgeRead();
 bool sendToCloud();
 
+// ======================================================
+// SETUP
+// ======================================================
 void setup()
 {
     Serial.begin(115200);
@@ -33,13 +45,19 @@ void setup()
     Serial.println("╚══════════════════════════════════════╝");
     Serial.println("");
 
+    // Set LED and buzzer pins as output
     pinMode(LED_PIN, OUTPUT);
+    pinMode(BUZZER_PIN, OUTPUT);
+
+    // Start with LED and buzzer OFF
     digitalWrite(LED_PIN, LOW);
+    digitalWrite(BUZZER_PIN, LOW);
 
-    // Init DHT sensor
+    // Start DHT22
     dht.begin();
-    delay(2000);  // DHT22 needs time to stabilize
+    delay(2000); // DHT22 needs time to stabilize
 
+    // Initialize TFLite model
     bool tflite_ok = TFLiteInference::init();
     if (tflite_ok)
     {
@@ -51,25 +69,37 @@ void setup()
     }
 
     Serial.println("");
+
+    // Connect to WiFi
     connectWiFi();
+
+    // Run one sensor read immediately at startup
     doEdgeRead();
+
+    // Save current time
     lastEdgeRead = millis();
     lastCloudSend = millis();
 }
 
+// ======================================================
+// LOOP
+// ======================================================
 void loop()
 {
     unsigned long now = millis();
 
+    // Run edge reading + AI at interval
     if (now - lastEdgeRead >= EDGE_READ_INTERVAL_MS)
     {
         lastEdgeRead = now;
         doEdgeRead();
     }
 
+    // Send to cloud at interval
     if (now - lastCloudSend >= CLOUD_SEND_INTERVAL_MS)
     {
         lastCloudSend = now;
+
         if (WiFi.status() == WL_CONNECTED)
         {
             sendToCloud();
@@ -82,12 +112,16 @@ void loop()
     }
 }
 
+// ======================================================
+// WIFI CONNECTION
+// ======================================================
 void connectWiFi()
 {
     Serial.printf("[WIFI] Connecting to %s", WIFI_SSID);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     int attempts = 0;
+
     while (WiFi.status() != WL_CONNECTED && attempts < 30)
     {
         delay(500);
@@ -99,28 +133,39 @@ void connectWiFi()
     {
         Serial.printf("\n[WIFI] Connected. IP: %s\n\n",
                       WiFi.localIP().toString().c_str());
+
+        // Small blink to show WiFi connected
         digitalWrite(LED_PIN, HIGH);
         delay(200);
         digitalWrite(LED_PIN, LOW);
     }
     else
     {
-        Serial.println("\n[WIFI] Connection failed. Will retry on next cloud send.\n");
+        Serial.println("\n[WIFI] Connection failed. Will retry later.\n");
     }
 }
 
+// ======================================================
+// SENSOR READING + AI LOGIC
+// ======================================================
 void doEdgeRead()
 {
     Serial.println("── Edge Read ───────────────────────────────");
 
-    // Read REAL sensors
+    // Read soil moisture sensor
     int soilRaw = analogRead(PIN_MOISTURE);
+
+    // Convert raw value to moisture percentage
+    // 4095 = very dry / air
+    // 1500 = wet soil
     g_moisture = map(soilRaw, 4095, 1500, 0, 100);
     g_moisture = constrain(g_moisture, 0, 100);
+
+    // Read temperature and humidity from DHT22
     g_temperature = dht.readTemperature();
     g_humidity = dht.readHumidity();
 
-    // Check if DHT22 failed
+    // Handle DHT read failure
     if (isnan(g_temperature) || isnan(g_humidity))
     {
         Serial.println("  [DHT22] FAILED - check wiring on GPIO4");
@@ -128,45 +173,76 @@ void doEdgeRead()
         g_humidity = 0.0f;
     }
 
-    Serial.printf("  Moisture:    %.1f %%\n", g_moisture);
-    Serial.printf("  Temperature: %.1f C\n", g_temperature);
-    Serial.printf("  Humidity:    %.1f %%\n\n", g_humidity);
+    // Print sensor values
+    Serial.printf("  Soil Raw:     %d\n", soilRaw);
+    Serial.printf("  Moisture:     %.1f %%\n", g_moisture);
+    Serial.printf("  Temperature:  %.1f C\n", g_temperature);
+    Serial.printf("  Humidity:     %.1f %%\n\n", g_humidity);
 
-    // Run TFLite inference
+    // Run TFLite model
     g_edgeState = TFLiteInference::predict(g_moisture, g_temperature, g_humidity);
+
+    // Convert class number to label
     String labels[] = {"OK", "IRRIGATE_SOON", "IRRIGATE_NOW"};
     g_edgeLabel = labels[g_edgeState];
+
     Serial.printf("  [AI RESULT] State: %d (%s)\n", g_edgeState, g_edgeLabel.c_str());
+
+    // ==================================================
+    // DEMO ALERT LOGIC
+    // ==================================================
+    // OK              -> LED OFF, buzzer OFF
+    // IRRIGATE_SOON   -> Slow blink + slow beep
+    // IRRIGATE_NOW    -> Fast blink + fast beep
 
     if (g_edgeState == 2)
     {
-        for (int i = 0; i < 5; i++)
+        // FAST blink for IRRIGATE_NOW
+        Serial.println("  [ALERT] IRRIGATE_NOW — FAST blink + beep");
+
+        for (int i = 0; i < 6; i++)
         {
             digitalWrite(LED_PIN, HIGH);
-            delay(100);
+            digitalWrite(BUZZER_PIN, HIGH);
+            delay(150);
+
             digitalWrite(LED_PIN, LOW);
-            delay(100);
+            digitalWrite(BUZZER_PIN, LOW);
+            delay(150);
         }
-        digitalWrite(LED_PIN, HIGH);
-        Serial.println("  [LED] ON — critical alert");
     }
     else if (g_edgeState == 1)
     {
-        digitalWrite(LED_PIN, HIGH);
-        delay(500);
-        digitalWrite(LED_PIN, LOW);
-        Serial.println("  [LED] Single blink — warning");
+        // SLOW blink for IRRIGATE_SOON
+        Serial.println("  [ALERT] IRRIGATE_SOON — SLOW blink + beep");
+
+        for (int i = 0; i < 3; i++)
+        {
+            digitalWrite(LED_PIN, HIGH);
+            digitalWrite(BUZZER_PIN, HIGH);
+            delay(500);
+
+            digitalWrite(LED_PIN, LOW);
+            digitalWrite(BUZZER_PIN, LOW);
+            delay(500);
+        }
     }
     else
     {
+        // OK condition
         digitalWrite(LED_PIN, LOW);
-        Serial.println("  [LED] OFF — conditions normal");
+        digitalWrite(BUZZER_PIN, LOW);
+
+        Serial.println("  [ALERT] OK — LED OFF, buzzer OFF");
     }
 
     Serial.println("────────────────────────────────────────────");
     Serial.println("");
 }
 
+// ======================================================
+// SEND DATA TO CLOUD
+// ======================================================
 bool sendToCloud()
 {
     Serial.println("── Cloud Send ──────────────────────────────");
@@ -176,6 +252,7 @@ bool sendToCloud()
     http.addHeader("Content-Type", "application/json");
     http.setTimeout(10000);
 
+    // Build JSON payload
     JsonDocument doc;
     doc["moisture"] = round(g_moisture * 10.0f) / 10.0f;
     doc["temperature"] = round(g_temperature * 10.0f) / 10.0f;
@@ -185,6 +262,7 @@ bool sendToCloud()
 
     String body;
     serializeJson(doc, body);
+
     Serial.println("  Payload: " + body);
 
     int httpCode = http.POST(body);
@@ -192,13 +270,6 @@ bool sendToCloud()
     if (httpCode == 200 || httpCode == 201)
     {
         Serial.printf("  [OK] HTTP %d — data stored in MongoDB\n", httpCode);
-        for (int i = 0; i < 2; i++)
-        {
-            digitalWrite(LED_PIN, HIGH);
-            delay(80);
-            digitalWrite(LED_PIN, LOW);
-            delay(80);
-        }
         http.end();
         return true;
     }
