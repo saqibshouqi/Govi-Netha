@@ -5,8 +5,8 @@
 /**
  * EdgeAI - rule-based irrigation classifier running on the ESP32.
  *
- * This is the first version of the edge AI. For Day 2 we will
- * replace this with a TFLite Micro model. The interface stays
+ * This is the first version of the edge AI. Will be
+ * replaced this with a TFLite Micro model. The interface stays
  * identical so the rest of the firmware does not change.
  *
  * Output states:
