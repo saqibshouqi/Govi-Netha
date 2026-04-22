@@ -1,6 +1,5 @@
 """
-Smart Irrigation — Routes
-Owner: Saqib
+Smart Irrigation - Routes
 Prefix: /api/irrigation
 """
 from fastapi import APIRouter, HTTPException

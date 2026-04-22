@@ -1,5 +1,5 @@
 """
-Govi Netha — TFLite Micro Irrigation Classifier Training
+Govi Netha - TFLite Micro Irrigation Classifier Training
 Trains a small neural network to classify irrigation urgency.
 Converts to TFLite with full integer quantization for ESP32.
 
@@ -35,7 +35,7 @@ now_mask = (
 )
 labels[now_mask] = 2
 
-# IRRIGATE_SOON (class 1) conditions — not already class 2
+# IRRIGATE_SOON (class 1) conditions - not already class 2
 soon_mask = (
     (~now_mask) & (
         (moisture < 60) |

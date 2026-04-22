@@ -56,7 +56,7 @@ export default function Irrigation() {
         <div>
             <div className="section-title">Smart Irrigation</div>
 
-            {/* ── Status hero ───────────────────────────────────────── */}
+            {/* Status hero */}
             <div style={{
                 background: heroStyle.gradient,
                 borderRadius: 20,
@@ -79,7 +79,7 @@ export default function Irrigation() {
                             {status?.status?.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) ?? 'No Data'}
                         </div>
                         <div style={{ fontSize: 12, opacity: 0.8, marginTop: 3, lineHeight: 1.4 }}>
-                            {status?.message ?? '—'}
+                            {status?.message ?? '-'}
                         </div>
                     </div>
                 </div>
@@ -88,14 +88,14 @@ export default function Irrigation() {
                 <div style={{ display: 'flex', gap: 24, marginTop: 18, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
                     <div>
                         <div style={{ fontSize: 26, fontWeight: 900, lineHeight: 1 }}>
-                            {status?.moisture_pct?.toFixed(1) ?? '—'}
+                            {status?.moisture_pct?.toFixed(1) ?? '-'}
                             <span style={{ fontSize: 13, fontWeight: 400, opacity: 0.8, marginLeft: 2 }}>%</span>
                         </div>
                         <div style={{ fontSize: 11, opacity: 0.7, marginTop: 3 }}>Moisture</div>
                     </div>
                     <div>
                         <div style={{ fontSize: 26, fontWeight: 900, lineHeight: 1 }}>
-                            {status?.temperature_c?.toFixed(1) ?? '—'}
+                            {status?.temperature_c?.toFixed(1) ?? '-'}
                             <span style={{ fontSize: 13, fontWeight: 400, opacity: 0.8, marginLeft: 2 }}>°C</span>
                         </div>
                         <div style={{ fontSize: 11, opacity: 0.7, marginTop: 3 }}>Temperature</div>
@@ -103,7 +103,7 @@ export default function Irrigation() {
                 </div>
             </div>
 
-            {/* ── ML Prediction ─────────────────────────────────────── */}
+            {/* ML Prediction */}
             {pred && (
                 <div className="card">
                     <div className="card-title" style={{ marginBottom: 12 }}>AI Prediction</div>
@@ -113,7 +113,7 @@ export default function Irrigation() {
                                 Next irrigation in
                             </div>
                             <div style={{ fontSize: 44, fontWeight: 900, lineHeight: 1, letterSpacing: -1, color: 'var(--text-primary)' }}>
-                                {predHours === 0 ? 'Now' : predHours !== null ? `${predHours}h` : '—'}
+                                {predHours === 0 ? 'Now' : predHours !== null ? `${predHours}h` : '-'}
                             </div>
                             {predHours > 0 && (
                                 <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 5 }}>
@@ -158,7 +158,7 @@ export default function Irrigation() {
                 </div>
             )}
 
-            {/* ── Moisture trend chart ──────────────────────────────── */}
+            {/* Moisture trend chart */}
             {history.length > 1 && (
                 <div className="card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -229,7 +229,7 @@ export default function Irrigation() {
                 </div>
             )}
 
-            {/* ── Threshold reference ───────────────────────────────── */}
+            {/* Threshold reference */}
             <div className="card">
                 <div className="card-title" style={{ marginBottom: 12 }}>Threshold Guide</div>
                 {[

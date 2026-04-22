@@ -17,7 +17,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="app-shell">
-        {/* ── Top bar ──────────────────────────────── */}
+        {/* Top bar */}
         <header className="topbar">
           <div className="topbar-brand">
             <div className="brand-logo">🌾</div>
@@ -31,7 +31,7 @@ export default function App() {
           </NavLink>
         </header>
 
-        {/* ── Page content ─────────────────────────── */}
+        {/* Page content */}
         <main className="page-content">
           <Routes>
             <Route path="/" element={<Dashboard />} />
@@ -41,7 +41,7 @@ export default function App() {
           </Routes>
         </main>
 
-        {/* ── Bottom nav ───────────────────────────── */}
+        {/* Bottom nav */}
         <nav className="bottom-nav">
           {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
             <NavLink

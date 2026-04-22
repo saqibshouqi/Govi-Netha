@@ -1,5 +1,5 @@
 """
-GOVI NETHA — FastAPI Backend (Irrigation scope)
+GOVI NETHA - FastAPI Backend (Irrigation scope)
 Run: uvicorn main:app --reload --port 8000
 Docs: http://localhost:8000/docs
 """
@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Govi Netha API",
-    description="AI Smart Irrigation System — CM3603 Group 17",
+    description="AI Smart Irrigation System - CM3603 Group 17",
     version="2.0.0",
     lifespan=lifespan,
 )

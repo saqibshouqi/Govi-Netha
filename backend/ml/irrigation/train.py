@@ -1,7 +1,4 @@
 """
-COMPONENT 1 — Irrigation ML Model Training
-Owner: Saqib
-
 Model: Random Forest Regressor
 Task:  Predict hours until next irrigation is needed
 Input: [soil_moisture %, temperature °C, drying_rate %/hr]
@@ -23,7 +20,7 @@ OUTPUT_PATH = Path(__file__).parent / "model.pkl"
 def generate_synthetic_data(n: int = 500) -> pd.DataFrame:
     """
     Generates synthetic training data.
-    REPLACE this with real sensor data once you have enough readings.
+    Can replace this with real sensor data if readings are sufficient.
     Export MongoDB data via: mongoexport --collection=sensor_readings
     """
     np.random.seed(42)

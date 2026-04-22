@@ -8,7 +8,7 @@ client: AsyncIOMotorClient = None
 async def connect_db():
     global client
     client = AsyncIOMotorClient(settings.mongodb_uri)
-    print(f"[DB] Connected to MongoDB Atlas — database: '{settings.mongodb_db_name}'")
+    print(f"[DB] Connected to MongoDB Atlas - database: '{settings.mongodb_db_name}'")
 
 async def close_db():
     global client

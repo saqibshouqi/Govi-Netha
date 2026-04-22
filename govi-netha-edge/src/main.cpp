@@ -6,14 +6,10 @@
 #include "config.h"
 #include "TFLiteInference.h"
 
-// ======================================================
 // DHT22 SENSOR OBJECT
-// ======================================================
 DHT dht(PIN_DHT, DHT22);
 
-// ======================================================
 // GLOBAL VARIABLES
-// ======================================================
 // Track time for periodic sensor reading and cloud sending
 unsigned long lastEdgeRead = 0;
 unsigned long lastCloudSend = 0;
@@ -25,23 +21,19 @@ float g_humidity = 0.0f;
 int g_edgeState = 0;
 String g_edgeLabel = "UNKNOWN";
 
-// ======================================================
 // FUNCTION DECLARATIONS
-// ======================================================
 void connectWiFi();
 void doEdgeRead();
 bool sendToCloud();
 
-// ======================================================
 // SETUP
-// ======================================================
 void setup()
 {
     Serial.begin(115200);
     delay(1000);
 
     Serial.println("\n╔══════════════════════════════════════╗");
-    Serial.println("║   GOVI NETHA — Edge Irrigation AI    ║");
+    Serial.println("║   GOVI NETHA - Edge Irrigation AI    ║");
     Serial.println("╚══════════════════════════════════════╝");
     Serial.println("");
 
@@ -65,7 +57,7 @@ void setup()
     }
     else
     {
-        Serial.println("[TFLITE] Model failed — using rule-based fallback.");
+        Serial.println("[TFLITE] Model failed - using rule-based fallback.");
     }
 
     Serial.println("");
@@ -81,9 +73,7 @@ void setup()
     lastCloudSend = millis();
 }
 
-// ======================================================
 // LOOP
-// ======================================================
 void loop()
 {
     unsigned long now = millis();
@@ -106,15 +96,13 @@ void loop()
         }
         else
         {
-            Serial.println("[WIFI] Disconnected — attempting reconnect...");
+            Serial.println("[WIFI] Disconnected - attempting reconnect...");
             connectWiFi();
         }
     }
 }
 
-// ======================================================
 // WIFI CONNECTION
-// ======================================================
 void connectWiFi()
 {
     Serial.printf("[WIFI] Connecting to %s", WIFI_SSID);
@@ -145,9 +133,7 @@ void connectWiFi()
     }
 }
 
-// ======================================================
 // SENSOR READING + AI LOGIC
-// ======================================================
 void doEdgeRead()
 {
     Serial.println("── Edge Read ───────────────────────────────");
@@ -198,9 +184,7 @@ void doEdgeRead()
 
     Serial.printf("  [AI RESULT] State: %d (%s)\n", g_edgeState, g_edgeLabel.c_str());
 
-    // ==================================================
     // DEMO ALERT LOGIC
-    // ==================================================
     // OK              -> LED OFF, buzzer OFF
     // IRRIGATE_SOON   -> Slow blink + slow beep
     // IRRIGATE_NOW    -> Fast blink + fast beep
@@ -208,7 +192,7 @@ void doEdgeRead()
     if (g_edgeState == 2)
     {
         // FAST blink for IRRIGATE_NOW
-        Serial.println("  [ALERT] IRRIGATE_NOW — FAST blink + beep");
+        Serial.println("  [ALERT] IRRIGATE_NOW - FAST blink + beep");
 
         for (int i = 0; i < 6; i++)
         {
@@ -224,7 +208,7 @@ void doEdgeRead()
     else if (g_edgeState == 1)
     {
         // SLOW blink for IRRIGATE_SOON
-        Serial.println("  [ALERT] IRRIGATE_SOON — SLOW blink + beep");
+        Serial.println("  [ALERT] IRRIGATE_SOON - SLOW blink + beep");
 
         for (int i = 0; i < 3; i++)
         {
@@ -243,16 +227,14 @@ void doEdgeRead()
         digitalWrite(LED_PIN, LOW);
         digitalWrite(BUZZER_PIN, LOW);
 
-        Serial.println("  [ALERT] OK — LED OFF, buzzer OFF");
+        Serial.println("  [ALERT] OK - LED OFF, buzzer OFF");
     }
 
     Serial.println("────────────────────────────────────────────");
     Serial.println("");
 }
 
-// ======================================================
 // SEND DATA TO CLOUD
-// ======================================================
 bool sendToCloud()
 {
     Serial.println("── Cloud Send ──────────────────────────────");
@@ -279,13 +261,13 @@ bool sendToCloud()
 
     if (httpCode == 200 || httpCode == 201)
     {
-        Serial.printf("  [OK] HTTP %d — data stored in MongoDB\n", httpCode);
+        Serial.printf("  [OK] HTTP %d - data stored in MongoDB\n", httpCode);
         http.end();
         return true;
     }
     else
     {
-        Serial.printf("  [ERROR] HTTP %d — check backend URL in config.h\n", httpCode);
+        Serial.printf("  [ERROR] HTTP %d - check backend URL in config.h\n", httpCode);
         http.end();
         return false;
     }
