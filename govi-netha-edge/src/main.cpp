@@ -156,10 +156,16 @@ void doEdgeRead()
     int soilRaw = analogRead(PIN_MOISTURE);
 
     // Convert raw value to moisture percentage
-    // 4095 = very dry / air
-    // 1500 = wet soil
-    g_moisture = map(soilRaw, 4095, 1500, 0, 100);
-    g_moisture = constrain(g_moisture, 0, 100);
+    // Calibration: DRY_VALUE = sensor reading in open air (adjust after calibration)
+    //              WET_VALUE  = sensor reading submerged in water (adjust after calibration)
+    // To calibrate: read soilRaw in air → that is your DRY_VALUE
+    //               read soilRaw in a cup of water → that is your WET_VALUE
+    const int DRY_VALUE = 2811; // adjust this after reading soilRaw in open air
+    const int WET_VALUE = 1134; // adjust this after reading soilRaw in water
+
+    g_moisture = (float)(soilRaw - WET_VALUE) / (float)(DRY_VALUE - WET_VALUE) * 100.0f;
+    g_moisture = 100.0f - g_moisture; // invert: low raw = wet = high %
+    g_moisture = constrain(g_moisture, 0.0f, 100.0f);
 
     // Read temperature and humidity from DHT22
     g_temperature = dht.readTemperature();
@@ -168,9 +174,13 @@ void doEdgeRead()
     // Handle DHT read failure
     if (isnan(g_temperature) || isnan(g_humidity))
     {
-        Serial.println("  [DHT22] FAILED - check wiring on GPIO4");
-        g_temperature = 0.0f;
-        g_humidity = 0.0f;
+        Serial.println("  [DHT22] FAILED - using last known values");
+        // g_temperature and g_humidity keep their previous global values
+        // Only reset on first boot if both are still 0
+        if (g_temperature == 0.0f)
+            g_temperature = 28.0f; // safe Sri Lanka default
+        if (g_humidity == 0.0f)
+            g_humidity = 70.0f;
     }
 
     // Print sensor values
