@@ -58,7 +58,17 @@ class IrrigationController:
         moisture = latest.get("moisture", 50)
         temp     = latest.get("temperature", 28)
 
-        # Try ML model first
+        # BUSINESS RULE: If already critical, return 0 immediately
+        if moisture < MOISTURE_CRITICAL:
+            return {
+                "source": "business_rule",
+                "irrigate_in_hours": 0.0,
+                "confidence": "high",
+                "current_moisture": moisture,
+                "message": "Moisture already below critical threshold — irrigate now.",
+            }
+
+        # Try ML model
         if MODEL_PATH.exists():
             try:
                 model = joblib.load(MODEL_PATH)
@@ -67,9 +77,13 @@ class IrrigationController:
                 trend = (moistures[0] - moistures[-1]) / len(moistures)  # drying rate
                 X = np.array([[moisture, temp, trend]])
                 hours = float(model.predict(X)[0])
+                
+                # Ensure prediction never goes negative
+                hours = max(0.0, hours)
+                
                 return {
                     "source": "ml_model",
-                    "irrigate_in_hours": round(max(0, hours), 1),
+                    "irrigate_in_hours": round(hours, 1),
                     "confidence": "high",
                     "current_moisture": moisture,
                 }
