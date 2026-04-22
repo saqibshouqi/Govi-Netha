@@ -5,7 +5,7 @@ const api = axios.create({
   timeout: 10000,
 })
 
-// ── Sensors (shared) ───────────────────────────────────────────
+// Sensors (shared)
 export const fetchLatestReading = () =>
   api.get('/sensors/latest').then(r => r.data)
 
@@ -15,7 +15,7 @@ export const fetchSensorHistory = (limit = 30) =>
 export const fetchAllAlerts = () =>
   api.get('/sensors/alerts').then(r => r.data)
 
-// ── Irrigation ─────────────────────────────────────────────────
+// Irrigation
 export const fetchIrrigationStatus = () =>
   api.get('/irrigation/status').then(r => r.data)
 

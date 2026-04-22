@@ -60,7 +60,7 @@ export default function Alerts() {
         </div>
       )}
 
-      {/* Alert cards — critical first */}
+      {/* Alert cards - critical first */}
       {[...critical, ...warning, ...normal].map((a, i) => (
         <AlertCard key={i} alert={a} />
       ))}
@@ -104,7 +104,7 @@ function AlertCard({ alert }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <span style={{ fontSize: 16 }}>{iconMap[alert.severity]}</span>
           <span style={{ fontWeight: 700, fontSize: 13 }}>
-            {alert.component?.toUpperCase()} — {alert.severity?.toUpperCase()}
+            {alert.component?.toUpperCase()} - {alert.severity?.toUpperCase()}
           </span>
         </div>
         <span className={`badge ${alert.severity}`}>{alert.severity?.toUpperCase()}</span>

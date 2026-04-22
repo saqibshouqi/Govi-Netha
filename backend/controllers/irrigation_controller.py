@@ -1,7 +1,6 @@
 """
-COMPONENT 1 — Irrigation Controller
-Owner: Saqib
-Business logic: threshold evaluation + ML prediction calls
+Irrigation Controller
+threshold evaluation + ML prediction calls
 """
 import joblib
 import numpy as np
@@ -37,7 +36,7 @@ class IrrigationController:
         else:
             status  = "ok"
             severity = "normal"
-            message = f"Soil moisture {moisture:.1f}% — no irrigation needed."
+            message = f"Soil moisture {moisture:.1f}% - no irrigation needed."
 
         return {
             "status": status,
@@ -65,7 +64,7 @@ class IrrigationController:
                 "irrigate_in_hours": 0.0,
                 "confidence": "high",
                 "current_moisture": moisture,
-                "message": "Moisture already below critical threshold — irrigate now.",
+                "message": "Moisture already below critical threshold - irrigate now.",
             }
 
         # Try ML model
@@ -88,7 +87,7 @@ class IrrigationController:
                     "current_moisture": moisture,
                 }
             except Exception as e:
-                print(f"[IRRIGATION ML] Model error: {e} — using rule-based fallback.")
+                print(f"[IRRIGATION ML] Model error: {e} - using rule-based fallback.")
 
         # Rule-based fallback
         drying_rate = 2.0  # % per hour estimate
@@ -101,5 +100,5 @@ class IrrigationController:
             "irrigate_in_hours": round(hours_until_critical, 1),
             "confidence": "medium",
             "current_moisture": moisture,
-            "note": "Train ML model for higher accuracy — see ml/irrigation/train.py",
+            "note": "Train ML model for higher accuracy - see ml/irrigation/train.py",
         }

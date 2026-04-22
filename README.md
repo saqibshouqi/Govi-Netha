@@ -1,6 +1,6 @@
-# 🌾 Govi Netha — AI Smart Irrigation System
+# 🌾 Govi Netha - AI Smart Irrigation System
 
-A low-cost, end-to-end Edge AI prototype that monitors paddy field soil moisture in real time, classifies irrigation urgency directly on a field-deployed ESP32, and delivers live recommendations to a mobile-friendly web dashboard — no internet connection required for field alerts.
+A low-cost, end-to-end Edge AI prototype that monitors paddy field soil moisture in real time, classifies irrigation urgency directly on a field-deployed ESP32, and delivers live recommendations to a mobile-friendly web dashboard - no internet connection required for field alerts.
 
 ---
 
@@ -11,7 +11,7 @@ A low-cost, end-to-end Edge AI prototype that monitors paddy field soil moisture
 - [Repository Structure](#-repository-structure)
 - [Quick Start](#-quick-start)
 - [Configuration](#-configuration)
-- [Edge AI — Irrigation Classes](#-edge-ai--irrigation-classes)
+- [Edge AI - Irrigation Classes](#-edge-ai--irrigation-classes)
 - [API Reference](#-api-reference)
 - [Moisture Sensor Calibration](#-moisture-sensor-calibration)
 - [Running the Tests](#-running-the-tests)
@@ -49,8 +49,8 @@ A low-cost, end-to-end Edge AI prototype that monitors paddy field soil moisture
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Edge AI runs every 1 minute** — immediate local alerts, no internet needed.  
-**Cloud sync every 5 minutes** — dashboard updates, ML predictions, historical data.
+**Edge AI runs every 1 minute** - immediate local alerts, no internet needed.  
+**Cloud sync every 5 minutes** - dashboard updates, ML predictions, historical data.
 
 ---
 
@@ -82,28 +82,28 @@ A low-cost, end-to-end Edge AI prototype that monitors paddy field soil moisture
 govi-netha/
 │
 ├── govi-netha-edge/               # ESP32 firmware (PlatformIO / Arduino C++)
-│   ├── platformio.ini             # Build config — board, libraries, upload port
+│   ├── platformio.ini             # Build config - board, libraries, upload port
 │   └── src/
-│       ├── main.cpp               # Entry point — reads sensors, runs AI, posts to cloud
+│       ├── main.cpp               # Entry point - reads sensors, runs AI, posts to cloud
 │       ├── config.h               # WiFi credentials, API URL, thresholds, pins ← EDIT THIS
-│       ├── TFLiteInference.h      # TFLite Micro wrapper — runs the neural network
+│       ├── TFLiteInference.h      # TFLite Micro wrapper - runs the neural network
 │       ├── EdgeAI.h               # Rule-based fallback classifier (same 0/1/2 output)
-│       └── irrigation_model.h     # Generated C array — run tflite-training scripts first
+│       └── irrigation_model.h     # Generated C array - run tflite-training scripts first
 │
 ├── backend/                       # Python FastAPI backend
 │   ├── main.py                    # App entry point, CORS, lifespan hooks
-│   ├── config.py                  # Pydantic settings — reads from .env
+│   ├── config.py                  # Pydantic settings - reads from .env
 │   ├── database.py                # MongoDB Atlas async connection (motor)
 │   ├── requirements.txt           # All Python dependencies
 │   ├── routes/
 │   │   ├── sensors.py             # POST /api/sensors/data · GET /api/sensors/*
 │   │   └── irrigation.py          # GET /api/irrigation/status|prediction|history
 │   ├── controllers/
-│   │   └── irrigation_controller.py   # Business logic — thresholds + ML calls
+│   │   └── irrigation_controller.py   # Business logic - thresholds + ML calls
 │   ├── models/
 │   │   └── sensor_data.py         # Pydantic schemas for sensor readings + alerts
 │   ├── ml/irrigation/
-│   │   └── train.py               # Random Forest — predicts hours until irrigation
+│   │   └── train.py               # Random Forest - predicts hours until irrigation
 │   └── tests/
 │       ├── conftest.py
 │       ├── test_irrigation_controller.py
@@ -115,7 +115,7 @@ govi-netha/
 │   ├── package.json
 │   └── src/
 │       ├── App.jsx                # Router + top bar + bottom nav
-│       ├── index.css              # Design system — colours, cards, badges
+│       ├── index.css              # Design system - colours, cards, badges
 │       ├── api/
 │       │   └── index.js           # All API calls centralised (axios)
 │       └── pages/
@@ -128,8 +128,8 @@ govi-netha/
 │   ├── train_irrigation_model.py  # Trains neural network, exports .tflite
 │   └── convert_to_c_array.py     # Converts .tflite binary → irrigation_model.h
 │
-├── .env                           # Your secrets — NEVER commit this file
-├── .env.example                   # Template — copy to .env and fill in values
+├── .env                           # Your secrets - NEVER commit this file
+├── .env.example                   # Template - copy to .env and fill in values
 ├── .gitignore
 └── README.md
 ```
@@ -143,11 +143,11 @@ govi-netha/
 - **Python** 3.10 or newer
 - **Node.js** 18 or newer
 - **VS Code** with the [PlatformIO IDE extension](https://platformio.org/install/ide?install=vscode)
-- ESP32 connected via USB (check Device Manager — should show a COM port)
+- ESP32 connected via USB (check Device Manager - should show a COM port)
 
 ---
 
-### Step 1 — Generate the TFLite Model
+### Step 1 - Generate the TFLite Model
 
 The firmware requires `irrigation_model.h`. Generate it first:
 
@@ -171,7 +171,7 @@ copy irrigation_model.h ..\govi-netha-edge\src\irrigation_model.h
 
 ---
 
-### Step 2 — Configure the ESP32 Firmware
+### Step 2 - Configure the ESP32 Firmware
 
 Open `govi-netha-edge/src/config.h` and update your WiFi credentials and backend IP address:
 
@@ -187,18 +187,18 @@ Open `govi-netha-edge/src/config.h` and update your WiFi credentials and backend
 
 ---
 
-### Step 3 — Flash the ESP32
+### Step 3 - Flash the ESP32
 
 1. Open the `govi-netha-edge/` folder in VS Code with PlatformIO
 2. Click **Build** (✓ checkmark in the bottom toolbar)
 3. Click **Upload** (→ arrow in the bottom toolbar)
-4. Click **Serial Monitor** (plug icon) — set baud rate to **115200**
+4. Click **Serial Monitor** (plug icon) - set baud rate to **115200**
 
 You should see sensor readings every minute and cloud sends every 5 minutes.
 
 ---
 
-### Step 4 — Start the Backend
+### Step 4 - Start the Backend
 
 ```bash
 cd backend
@@ -224,7 +224,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 ---
 
-### Step 5 — Start the Frontend
+### Step 5 - Start the Frontend
 
 Open a new terminal (keep the backend running):
 
@@ -238,18 +238,18 @@ npm run dev
 
 ---
 
-### Step 6 — Verify the Full Pipeline
+### Step 6 - Verify the Full Pipeline
 
 Open the Serial Monitor in PlatformIO. After the cloud send interval, you should see:
 
 ```
 ── Cloud Send ──────────────────────────────
   Payload: {"moisture":55.2,"temperature":28.5,"humidity":71.3,...}
-  [OK] HTTP 201 — data stored in MongoDB
+  [OK] HTTP 201 - data stored in MongoDB
 ────────────────────────────────────────────
 ```
 
-Then open the dashboard at `http://localhost:5173` — the hero card will show live moisture data from your sensor.
+Then open the dashboard at `http://localhost:5173` - the hero card will show live moisture data from your sensor.
 
 ---
 
@@ -272,9 +272,9 @@ Copy `.env.example` to `.env` and fill in your values. **Never commit `.env` to 
 
 | Constant | Default | Description |
 |---|---|---|
-| `WIFI_SSID` | — | Your WiFi network name |
-| `WIFI_PASSWORD` | — | Your WiFi password |
-| `API_BASE_URL` | — | Your PC's local IP + port |
+| `WIFI_SSID` | - | Your WiFi network name |
+| `WIFI_PASSWORD` | - | Your WiFi password |
+| `API_BASE_URL` | - | Your PC's local IP + port |
 | `EDGE_READ_INTERVAL_MS` | `60000` (1 min) | How often to read sensors + run AI |
 | `CLOUD_SEND_INTERVAL_MS` | `300000` (5 min) | How often to POST to backend |
 | `MOISTURE_CRITICAL` | `40.0` | Moisture % below which = irrigate now |
@@ -287,7 +287,7 @@ Copy `.env.example` to `.env` and fill in your values. **Never commit `.env` to 
 
 ---
 
-## 🤖 Edge AI — Irrigation Classes
+## 🤖 Edge AI - Irrigation Classes
 
 The TFLite Micro neural network (3 inputs → 16 → 8 → 3 outputs) classifies each reading into one of three states:
 
@@ -305,14 +305,14 @@ If the TFLite model fails to load for any reason, `EdgeAI.h` provides an identic
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/` | Health check — returns system name |
+| `GET` | `/` | Health check - returns system name |
 | `GET` | `/api/health` | Returns `{"status": "healthy"}` |
 | `POST` | `/api/sensors/data` | ESP32 posts a sensor reading (runs auto-alert logic) |
 | `GET` | `/api/sensors/latest` | Most recent sensor snapshot |
 | `GET` | `/api/sensors/history` | Last N readings (default 50) |
 | `GET` | `/api/sensors/alerts` | All unresolved alerts |
 | `GET` | `/api/irrigation/status` | Current irrigation recommendation |
-| `GET` | `/api/irrigation/prediction` | ML prediction — hours until irrigation needed |
+| `GET` | `/api/irrigation/prediction` | ML prediction - hours until irrigation needed |
 | `GET` | `/api/irrigation/history` | Moisture + temperature trend data for chart |
 
 > Full interactive documentation: **http://localhost:8000/docs** (Swagger UI)
@@ -324,8 +324,8 @@ If the TFLite model fails to load for any reason, `EdgeAI.h` provides an identic
 The capacitive soil moisture sensor needs calibration for accurate readings. Do this once after first flash:
 
 1. Open the PlatformIO Serial Monitor
-2. Hold the sensor in **open air** — note the `Soil Raw:` value → this is your `DRY_VALUE`
-3. Submerge the sensor tip in a **glass of water** — note the value → this is your `WET_VALUE`
+2. Hold the sensor in **open air** - note the `Soil Raw:` value → this is your `DRY_VALUE`
+3. Submerge the sensor tip in a **glass of water** - note the value → this is your `WET_VALUE`
 4. Open `govi-netha-edge/src/main.cpp` and update the calibration constants:
 
 ```cpp
@@ -364,20 +364,20 @@ Tests cover:
 
 ## 🛠 Troubleshooting
 
-### ESP32 — WiFi won't connect
+### ESP32 - WiFi won't connect
 
 - Confirm `WIFI_SSID` and `WIFI_PASSWORD` in `config.h` are correct
-- ESP32 only supports **2.4 GHz** networks — it will not connect to 5 GHz
+- ESP32 only supports **2.4 GHz** networks - it will not connect to 5 GHz
 - The SSID is case-sensitive
 
-### ESP32 — HTTP -1 (connection failed)
+### ESP32 - HTTP -1 (connection failed)
 
 - Run `ipconfig` and confirm your `API_BASE_URL` uses the correct IPv4 address
 - Make sure you start the backend with `--host 0.0.0.0` (not just `--port 8000`)
 - Add an inbound firewall rule in Windows Defender for **TCP port 8000**
 - Confirm your PC and the ESP32 are on the same WiFi network
 
-### Backend — `ValidationError: vite_api_base_url extra inputs not permitted`
+### Backend - `ValidationError: vite_api_base_url extra inputs not permitted`
 
 The `.env` file contains frontend variables that Pydantic rejects. Add `extra = "ignore"` to the `Config` class in `backend/config.py`:
 
@@ -388,9 +388,9 @@ class Config:
     extra = "ignore"   # ← add this line
 ```
 
-### Backend — MongoDB connection timeout
+### Backend - MongoDB connection timeout
 
-- Check the `MONGODB_URI` in `.env` — special characters in the password must be URL-encoded
+- Check the `MONGODB_URI` in `.env` - special characters in the password must be URL-encoded
 - In MongoDB Atlas, go to **Network Access** and confirm `0.0.0.0/0` is in the allowlist
 - Test the connection directly:
 
@@ -398,7 +398,7 @@ class Config:
 python -c "from database import *; import asyncio; asyncio.run(connect_db())"
 ```
 
-### Backend — `FileNotFoundError: model.pkl`
+### Backend - `FileNotFoundError: model.pkl`
 
 The Random Forest model hasn't been trained yet. Run:
 
@@ -408,7 +408,7 @@ python ml/irrigation/train.py
 
 The controller falls back to rule-based predictions automatically until the model exists.
 
-### Firmware — `irrigation_model.h: No such file or directory`
+### Firmware - `irrigation_model.h: No such file or directory`
 
 The TFLite model header hasn't been generated. Run from the `tflite-training/` folder:
 
@@ -418,7 +418,7 @@ python convert_to_c_array.py
 copy irrigation_model.h ..\govi-netha-edge\src\irrigation_model.h
 ```
 
-### Firmware — TFLite compilation errors
+### Firmware - TFLite compilation errors
 
 If the `TensorFlowLite_ESP32` library version doesn't match the API in `TFLiteInference.h`, switch to the rule-based fallback. In `main.cpp`, replace:
 
@@ -434,13 +434,13 @@ with:
 
 And in `doEdgeRead()`, replace `TFLiteInference::predict(...)` with `EdgeAI::classify(...)`.
 
-### Dashboard — "Could not load data"
+### Dashboard - "Could not load data"
 
 - Confirm the backend is running on port 8000
-- The Vite dev server automatically proxies `/api` calls to `http://localhost:8000` — no CORS issues in development
+- The Vite dev server automatically proxies `/api` calls to `http://localhost:8000` - no CORS issues in development
 - Check the browser console (F12) for network errors
 
-### Irrigation Prediction — 400 Bad Request
+### Irrigation Prediction - 400 Bad Request
 
 The `/api/irrigation/prediction` endpoint requires at least 3 stored sensor readings. This resolves automatically after the ESP32 successfully sends a few readings to the cloud.
 
@@ -448,7 +448,7 @@ The `/api/irrigation/prediction` endpoint requires at least 3 stored sensor read
 
 - Check the GPIO pin in `config.h` matches your physical wiring (default: GPIO 4)
 - DHT22 requires a **10 kΩ pull-up resistor** between the data pin and 3.3 V
-- Add a 2-second delay after `dht.begin()` — the sensor needs warm-up time
+- Add a 2-second delay after `dht.begin()` - the sensor needs warm-up time
 
 ---
 
@@ -465,4 +465,4 @@ The `/api/irrigation/prediction` endpoint requires at least 3 stored sensor read
 
 ---
 
-*Govi Netha — bringing affordable data-driven irrigation to Sri Lanka's paddy farmers.*
+*Govi Netha - bringing affordable data-driven irrigation to Sri Lanka's paddy farmers.*

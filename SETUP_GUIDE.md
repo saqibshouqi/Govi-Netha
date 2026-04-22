@@ -1,4 +1,4 @@
-# GOVI NETHA — Complete Setup Guide
+# GOVI NETHA - Complete Setup Guide
 
 ---
 
@@ -7,36 +7,36 @@
 Do this once as a group. **One person** (suggest Saqib as group lead) creates
 the cluster and shares the connection string with everyone.
 
-### Step 1 — Create a free account
+### Step 1 - Create a free account
 1. Go to https://www.mongodb.com/cloud/atlas/register
 2. Sign up with a Google/GitHub account or email
 3. Choose **"Deploy a free cluster"** when prompted
 
-### Step 2 — Create your free M0 cluster
-1. Select **"M0 FREE"** tier (512 MB storage — plenty for coursework)
+### Step 2 - Create your free M0 cluster
+1. Select **"M0 FREE"** tier (512 MB storage - plenty for coursework)
 2. Cloud provider: **AWS** | Region: choose one nearest to Sri Lanka
    → recommended: **Asia Pacific (Singapore)** `ap-southeast-1`
 3. Cluster name: `govi-netha-cluster`
 4. Click **"Create Deployment"**
 
-### Step 3 — Create a database user
+### Step 3 - Create a database user
 1. In the dialog that appears, set:
    - Username: `govinetha`
-   - Password: Click "Autogenerate" — **copy this password**
+   - Password: Click "Autogenerate" - **copy this password**
 2. Click **"Create Database User"**
 
-### Step 4 — Whitelist IP addresses (allow all)
+### Step 4 - Whitelist IP addresses (allow all)
 1. In the "Where would you like to connect from?" dialog
 2. Click **"Add My Current IP Address"**
 3. ALSO click **"Allow Access from Anywhere"** → `0.0.0.0/0`
    *(This lets the ESP32 and deployed backend connect)*
 4. Click **"Finish and Close"**
 
-### Step 5 — Get your connection string
+### Step 5 - Get your connection string
 1. In Atlas dashboard, click **"Connect"** on your cluster
 2. Choose **"Drivers"**
 3. Select Driver: **Python**, Version: **3.12 or later**
-4. Copy the connection string — it looks like:
+4. Copy the connection string - it looks like:
    ```
    mongodb+srv://govinetha:<password>@govi-netha-cluster.xxxxx.mongodb.net/?retryWrites=true&w=majority
    ```
@@ -46,19 +46,19 @@ the cluster and shares the connection string with everyone.
    mongodb+srv://govinetha:YOURPASSWORD@govi-netha-cluster.xxxxx.mongodb.net/govi_netha?retryWrites=true&w=majority
    ```
 
-### Step 6 — Put the string in your .env file
+### Step 6 - Put the string in your .env file
 ```
 MONGODB_URI=mongodb+srv://govinetha:YOURPASSWORD@govi-netha-cluster.xxxxx.mongodb.net/govi_netha?retryWrites=true&w=majority
 MONGODB_DB_NAME=govi_netha
 ```
 
-### Step 7 — Share with the team
+### Step 7 - Share with the team
 Share the final MONGODB_URI string with all 4 members via WhatsApp/Discord.
 **Never commit this string to GitHub.**
 
 ### Collections that will be auto-created
-- `sensor_readings` — all ESP32 telemetry
-- `alerts`          — edge + cloud alerts from all components
+- `sensor_readings` - all ESP32 telemetry
+- `alerts`          - edge + cloud alerts from all components
 
 ---
 
@@ -106,7 +106,7 @@ git checkout -b feature/roshana-stress
 
 ---
 
-### DAY 1 — Sunday 5th: Foundation & Edge AI
+### DAY 1 - Sunday 5th: Foundation & Edge AI
 **Goal: Shared architecture running, hardware wired, edge logic verified on serial monitor**
 
 #### All members (30 min together):
@@ -117,7 +117,7 @@ git checkout -b feature/roshana-stress
 - [ ] All run the backend: `cd backend && uvicorn main:app --reload`
       → confirm http://localhost:8000/docs loads
 - [ ] All run the frontend: `cd frontend && npm install && npm run dev`
-      → confirm http://localhost:5173 loads (will show loading — that's OK)
+      → confirm http://localhost:5173 loads (will show loading - that's OK)
 
 #### Hardware (together if using one ESP32):
 Wire up in this order:
@@ -142,18 +142,18 @@ Wire up in this order:
   → adjust `_calibrationOffset` in SoilPH.cpp until readings match
 
 - **Roshana:** Edit `edge/src/components/stress/StressEdge.h`
-  → tune stress weights — hold DHT sensor over hot lamp to trigger HIGH stress
+  → tune stress weights - hold DHT sensor over hot lamp to trigger HIGH stress
   → verify stress index rises above STRESS_INDEX_CRITICAL threshold
 
 #### End of Day 1 checkpoint:
 - Serial monitor shows sensor readings every 10s
 - Edge AI prints correct CRITICAL/WARNING/OK for all 4 components
 - Backend starts without errors
-- Frontend loads (data pages show "No sensor data" — this is fine)
+- Frontend loads (data pages show "No sensor data" - this is fine)
 
 ---
 
-### DAY 2 — Saturday 11th: Cloud (APIs + ML Models)
+### DAY 2 - Saturday 11th: Cloud (APIs + ML Models)
 **Goal: ESP32 → API → MongoDB working; ML models trained and predictions live**
 
 #### Morning (shared, 1 hour together):
@@ -164,7 +164,7 @@ Wire up in this order:
 
 #### Afternoon (individual):
 
-##### Saqib — Irrigation:
+##### Saqib - Irrigation:
 ```bash
 cd backend
 python ml/irrigation/train.py   # trains + saves model.pkl
@@ -174,9 +174,9 @@ python ml/irrigation/train.py   # trains + saves model.pkl
 - Check the response includes `irrigate_in_hours` from ML model (source: "ml_model")
 - Edit `edge/src/main.cpp`: confirm CLOUD_SEND_INTERVAL_MS and API_POST_SENSORS
   are set correctly in config.h (use your PC's local IP)
-- Flash ESP32, watch serial — confirm "[CLOUD] Data sent successfully."
+- Flash ESP32, watch serial - confirm "[CLOUD] Data sent successfully."
 
-##### Januki — NPK:
+##### Januki - NPK:
 ```bash
 python ml/npk/train.py
 ```
@@ -186,7 +186,7 @@ python ml/npk/train.py
   after evaluate_status(), also insert an alert to db.alerts if severity != "normal"
   (pattern: copy from irrigation_controller)
 
-##### Ravisha — pH:
+##### Ravisha - pH:
 ```bash
 python ml/ph/train.py
 ```
@@ -194,7 +194,7 @@ python ml/ph/train.py
 - Verify lime/sulphur kg/acre recommendation appears
 - Test with ph=4.0 → should return ~1250 kg/acre lime
 
-##### Roshana — Stress:
+##### Roshana - Stress:
 ```bash
 python ml/stress/train.py
 ```
@@ -208,7 +208,7 @@ python ml/stress/train.py
 
 ---
 
-### DAY 3 — Sunday 12th: Integration, UI, Bug Fixing
+### DAY 3 - Sunday 12th: Integration, UI, Bug Fixing
 **Goal: All 4 pages populated with live data, final demo-ready build**
 
 #### Morning: Merge all branches into main
@@ -233,11 +233,11 @@ Each person:
 3. Makes the UI match the wireframe as closely as possible
 
 Shared UI tasks (decide who does what):
-- **Dashboard.jsx** — Saqib (overview of all sensors)
-- **Soil.jsx**      — Januki + Ravisha (NPK + pH together)
-- **Stress.jsx**    — Roshana
-- **Tips.jsx**      — Januki or whoever finishes early
-- **Alerts.jsx**    — Roshana or whoever finishes early
+- **Dashboard.jsx** - Saqib (overview of all sensors)
+- **Soil.jsx**      - Januki + Ravisha (NPK + pH together)
+- **Stress.jsx**    - Roshana
+- **Tips.jsx**      - Januki or whoever finishes early
+- **Alerts.jsx**    - Roshana or whoever finishes early
 
 #### Afternoon: Integration testing
 Run the full stack together:
@@ -270,7 +270,7 @@ cd frontend && npm run build   # generates dist/ folder
 
 ---
 
-## PART 4: Quick Reference — Common Issues & Fixes
+## PART 4: Quick Reference - Common Issues & Fixes
 
 ### ESP32 can't connect to WiFi
 → Double-check WIFI_SSID and WIFI_PASSWORD in `edge/src/config.h`
@@ -289,7 +289,7 @@ pip install -r requirements.txt
 ```
 
 ### MongoDB connection timeout
-→ Check your MONGODB_URI in .env — password must not contain special chars unescaped
+→ Check your MONGODB_URI in .env - password must not contain special chars unescaped
 → Check Network Access in Atlas → `0.0.0.0/0` must be in the list
 → Try pinging from Python: `python -c "from database import *; import asyncio; asyncio.run(connect_db())"`
 
@@ -299,10 +299,10 @@ pip install -r requirements.txt
 
 ### Frontend shows "Could not load data"
 → Make sure backend is running on port 8000
-→ Check browser console for CORS errors — ensure your URL is in CORS allow_origins in main.py
+→ Check browser console for CORS errors - ensure your URL is in CORS allow_origins in main.py
 
 ### pH sensor reading 14.0 or 0.0
-→ Sensor needs calibration — use buffer solution pH 4 and pH 7
+→ Sensor needs calibration - use buffer solution pH 4 and pH 7
 → Adjust `_calibrationOffset` in `edge/src/sensors/SoilPH.cpp`
 
 ### DHT sensor returns -1
@@ -317,7 +317,7 @@ If hardware is not available or sensor values are all 0, add this to `edge/src/m
 in `readAllSensors()` for simulation:
 
 ```cpp
-// SIMULATION MODE — remove when hardware is ready
+// SIMULATION MODE - remove when hardware is ready
 moisturePct   = 35.0 + random(-5, 5);   // trigger irrigation alerts
 temperatureC  = 29.0 + random(-2, 8);
 humidityPct   = 68.0 + random(-10, 10);

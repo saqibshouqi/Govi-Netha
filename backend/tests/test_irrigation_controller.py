@@ -11,7 +11,7 @@ from controllers.irrigation_controller import (
 )
 
 
-# ── evaluate_status ──────────────────────────────────────────────────────────
+# evaluate_status
 
 class TestEvaluateStatus:
 
@@ -59,7 +59,7 @@ class TestEvaluateStatus:
         assert result["moisture_pct"] == 55.5
 
 
-# ── predict ──────────────────────────────────────────────────────────────────
+# predict
 
 class TestPredict:
 

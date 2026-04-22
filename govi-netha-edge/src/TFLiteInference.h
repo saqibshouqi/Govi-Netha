@@ -26,7 +26,7 @@ static constexpr float STD_MOISTURE = 26.2447f;
 static constexpr float STD_TEMPERATURE = 6.3223f;
 static constexpr float STD_HUMIDITY = 17.1322f;
 
-// Tensor arena — scratch memory for TFLite Micro operations.
+// Tensor arena - scratch memory for TFLite Micro operations.
 // 8KB is sufficient for this small 3-layer model.
 static constexpr int TENSOR_ARENA_SIZE = 8 * 1024;
 static uint8_t tensor_arena[TENSOR_ARENA_SIZE];
@@ -78,7 +78,7 @@ public:
     {
         if (!tfl_interpreter)
         {
-            Serial.println("[TFLITE] Not initialised — returning rule-based fallback");
+            Serial.println("[TFLITE] Not initialised - returning rule-based fallback");
             return ruleFallback(moisture, temp, humidity);
         }
 

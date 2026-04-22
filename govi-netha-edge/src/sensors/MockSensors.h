@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 /**
- * MockSensors — generates realistic paddy field sensor data
+ * MockSensors - generates realistic paddy field sensor data
  * for development and testing before physical sensors arrive.
  *
  * Simulates:
@@ -41,7 +41,7 @@ public:
         if (moisture < 25.0f)
         {
             moisture = 72.0f + random(0, 100) / 10.0f;
-            Serial.println("[MOCK] Irrigation event simulated — moisture reset");
+            Serial.println("[MOCK] Irrigation event simulated - moisture reset");
         }
 
         return constrain(moisture, 20.0f, 95.0f);

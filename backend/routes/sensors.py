@@ -1,6 +1,6 @@
 """
 Shared sensor ingestion route.
-POST /api/sensors/data  — called by ESP32 firmware every CLOUD_SEND_INTERVAL_MS
+POST /api/sensors/data  - called by ESP32 firmware every CLOUD_SEND_INTERVAL_MS
 Automatically evaluates irrigation status and writes alerts when needed.
 """
 from fastapi import APIRouter, HTTPException
@@ -13,7 +13,7 @@ from controllers.irrigation_controller import IrrigationController
 router = APIRouter()
 
 
-# ── POST /api/sensors/data ─────────────────────────────────────────────────
+# POST /api/sensors/data
 @router.post("/data", status_code=201)
 async def ingest_sensor_data(reading: SensorReading):
     """
@@ -45,10 +45,10 @@ async def ingest_sensor_data(reading: SensorReading):
     }
 
 
-# ── GET /api/sensors/latest ────────────────────────────────────────────────
+# GET /api/sensors/latest
 @router.get("/latest")
 async def get_latest_reading():
-    """Returns the most recent sensor snapshot — used by the dashboard."""
+    """Returns the most recent sensor snapshot - used by the dashboard."""
     db  = get_db()
     doc = await db.sensor_readings.find_one(sort=[("created_at", -1)])
     if not doc:
@@ -57,7 +57,7 @@ async def get_latest_reading():
     return doc
 
 
-# ── GET /api/sensors/history?limit=50 ─────────────────────────────────────
+# GET /api/sensors/history?limit=50
 @router.get("/history")
 async def get_sensor_history(limit: int = 50):
     """Returns last N readings in reverse-chronological order."""
@@ -69,7 +69,7 @@ async def get_sensor_history(limit: int = 50):
     return docs
 
 
-# ── GET /api/sensors/alerts ────────────────────────────────────────────────
+# GET /api/sensors/alerts
 @router.get("/alerts")
 async def get_all_alerts(resolved: bool = False, limit: int = 50):
     """Returns unresolved (or resolved) alerts, most-recent first."""
