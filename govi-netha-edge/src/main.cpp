@@ -41,7 +41,7 @@ void setup()
     delay(1000);
 
     Serial.println("\n╔══════════════════════════════════════╗");
-    Serial.println("║   GOVI NETHA — Edge Irrigation AI    ║");
+    Serial.println("║   GOVI NETHA - Edge Irrigation AI    ║");
     Serial.println("╚══════════════════════════════════════╝");
     Serial.println("");
 
@@ -65,7 +65,7 @@ void setup()
     }
     else
     {
-        Serial.println("[TFLITE] Model failed — using rule-based fallback.");
+        Serial.println("[TFLITE] Model failed - using rule-based fallback.");
     }
 
     Serial.println("");
@@ -106,7 +106,7 @@ void loop()
         }
         else
         {
-            Serial.println("[WIFI] Disconnected — attempting reconnect...");
+            Serial.println("[WIFI] Disconnected - attempting reconnect...");
             connectWiFi();
         }
     }
@@ -208,7 +208,7 @@ void doEdgeRead()
     if (g_edgeState == 2)
     {
         // FAST blink for IRRIGATE_NOW
-        Serial.println("  [ALERT] IRRIGATE_NOW — FAST blink + beep");
+        Serial.println("  [ALERT] IRRIGATE_NOW - FAST blink + beep");
 
         for (int i = 0; i < 6; i++)
         {
@@ -224,7 +224,7 @@ void doEdgeRead()
     else if (g_edgeState == 1)
     {
         // SLOW blink for IRRIGATE_SOON
-        Serial.println("  [ALERT] IRRIGATE_SOON — SLOW blink + beep");
+        Serial.println("  [ALERT] IRRIGATE_SOON - SLOW blink + beep");
 
         for (int i = 0; i < 3; i++)
         {
@@ -243,7 +243,7 @@ void doEdgeRead()
         digitalWrite(LED_PIN, LOW);
         digitalWrite(BUZZER_PIN, LOW);
 
-        Serial.println("  [ALERT] OK — LED OFF, buzzer OFF");
+        Serial.println("  [ALERT] OK - LED OFF, buzzer OFF");
     }
 
     Serial.println("────────────────────────────────────────────");
@@ -279,13 +279,13 @@ bool sendToCloud()
 
     if (httpCode == 200 || httpCode == 201)
     {
-        Serial.printf("  [OK] HTTP %d — data stored in MongoDB\n", httpCode);
+        Serial.printf("  [OK] HTTP %d - data stored in MongoDB\n", httpCode);
         http.end();
         return true;
     }
     else
     {
-        Serial.printf("  [ERROR] HTTP %d — check backend URL in config.h\n", httpCode);
+        Serial.printf("  [ERROR] HTTP %d - check backend URL in config.h\n", httpCode);
         http.end();
         return false;
     }

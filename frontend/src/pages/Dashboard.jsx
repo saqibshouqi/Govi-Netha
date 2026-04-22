@@ -29,7 +29,7 @@ export default function Dashboard() {
       setLastUpdate(new Date())
       setError(null)
     } catch {
-      setError('Could not load data — is the backend running?')
+      setError('Could not load data - is the backend running?')
     } finally {
       setLoading(false)
     }
@@ -93,7 +93,7 @@ export default function Dashboard() {
             </div>
             <div style={{ marginTop: 6, fontSize: 13, fontWeight: 600, opacity: 0.9 }}>{moistureLabel}</div>
             <div style={{ marginTop: 4, fontSize: 11, opacity: 0.65 }}>
-              Updated {lastUpdate ? lastUpdate.toLocaleTimeString() : '—'}
+              Updated {lastUpdate ? lastUpdate.toLocaleTimeString() : '-'}
             </div>
           </div>
           <MoistureRing value={moisture} />
@@ -115,7 +115,7 @@ export default function Dashboard() {
         <div className="stat-card">
           <div style={{ fontSize: 20, marginBottom: 2 }}>🌡️</div>
           <div className="stat-value">
-            {reading?.temperature?.toFixed(1) ?? '—'}
+            {reading?.temperature?.toFixed(1) ?? '-'}
             <span className="stat-unit">°C</span>
           </div>
           <div className="stat-label">Temperature</div>
@@ -123,7 +123,7 @@ export default function Dashboard() {
         <div className="stat-card">
           <div style={{ fontSize: 20, marginBottom: 2 }}>💨</div>
           <div className="stat-value">
-            {reading?.humidity?.toFixed(1) ?? '—'}
+            {reading?.humidity?.toFixed(1) ?? '-'}
             <span className="stat-unit">%</span>
           </div>
           <div className="stat-label">Humidity</div>

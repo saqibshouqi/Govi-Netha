@@ -1,5 +1,5 @@
 """
-Sensor data models — irrigation scope only.
+Sensor data models - irrigation scope only.
 Matches the payload sent by the ESP32 firmware (main.cpp → sendToCloud).
 """
 from pydantic import BaseModel, Field
