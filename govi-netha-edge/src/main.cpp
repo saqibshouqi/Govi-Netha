@@ -6,14 +6,10 @@
 #include "config.h"
 #include "TFLiteInference.h"
 
-// ======================================================
 // DHT22 SENSOR OBJECT
-// ======================================================
 DHT dht(PIN_DHT, DHT22);
 
-// ======================================================
 // GLOBAL VARIABLES
-// ======================================================
 // Track time for periodic sensor reading and cloud sending
 unsigned long lastEdgeRead = 0;
 unsigned long lastCloudSend = 0;
@@ -25,16 +21,12 @@ float g_humidity = 0.0f;
 int g_edgeState = 0;
 String g_edgeLabel = "UNKNOWN";
 
-// ======================================================
 // FUNCTION DECLARATIONS
-// ======================================================
 void connectWiFi();
 void doEdgeRead();
 bool sendToCloud();
 
-// ======================================================
 // SETUP
-// ======================================================
 void setup()
 {
     Serial.begin(115200);
@@ -81,9 +73,7 @@ void setup()
     lastCloudSend = millis();
 }
 
-// ======================================================
 // LOOP
-// ======================================================
 void loop()
 {
     unsigned long now = millis();
@@ -112,9 +102,7 @@ void loop()
     }
 }
 
-// ======================================================
 // WIFI CONNECTION
-// ======================================================
 void connectWiFi()
 {
     Serial.printf("[WIFI] Connecting to %s", WIFI_SSID);
@@ -145,9 +133,7 @@ void connectWiFi()
     }
 }
 
-// ======================================================
 // SENSOR READING + AI LOGIC
-// ======================================================
 void doEdgeRead()
 {
     Serial.println("── Edge Read ───────────────────────────────");
@@ -198,9 +184,7 @@ void doEdgeRead()
 
     Serial.printf("  [AI RESULT] State: %d (%s)\n", g_edgeState, g_edgeLabel.c_str());
 
-    // ==================================================
     // DEMO ALERT LOGIC
-    // ==================================================
     // OK              -> LED OFF, buzzer OFF
     // IRRIGATE_SOON   -> Slow blink + slow beep
     // IRRIGATE_NOW    -> Fast blink + fast beep
@@ -250,9 +234,7 @@ void doEdgeRead()
     Serial.println("");
 }
 
-// ======================================================
 // SEND DATA TO CLOUD
-// ======================================================
 bool sendToCloud()
 {
     Serial.println("── Cloud Send ──────────────────────────────");
