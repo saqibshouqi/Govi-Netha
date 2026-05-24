@@ -1,8 +1,8 @@
 #pragma once
 
 // WiFi credentials
-#define WIFI_SSID "Dialog-4G-DA48"
-#define WIFI_PASSWORD "60252615"
+#define WIFI_SSID 
+#define WIFI_PASSWORD 
 
 // API endpoint
 #define API_BASE_URL "http://192.168.0.4:8000/api"
